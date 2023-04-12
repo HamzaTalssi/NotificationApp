@@ -1,0 +1,11 @@
+spring:
+ rabbitmq:
+   host: localhost
+   port: 5672
+
+logging:
+ level:
+  org: ERROR
+
+server:
+ port: 8089
