@@ -1,0 +1,57 @@
+package com.thelast.pds.episen.notificationmanagerservice.mock;
+
+import java.util.Date;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+
+import com.thelast.pds.episen.notificationmanagerservice.producer.notification.service.NotificationTraffic;
+
+public class MyTimerTraffic implements Runnable {
+	private static final Logger log = LoggerFactory.getLogger(MyTimerTraffic.class);
+	private int normalDuration = 5; // normal scenario duration in seconds
+	private int perturbedDuration = 1; // perturbed scenario duration in seconds
+
+	@Autowired
+	private NotificationTraffic notificationTraffic = new NotificationTraffic();
+
+	@Override
+	public void run() {
+		runNormalTraffic();
+	}
+
+	private void runNormalTraffic() {
+		while (true) {
+			log.info("[{}] The traffic is normal in A", new Date());
+			boolean PerturbedTraffic = Math.random() < 0.2; // less than 20% chance of perturbed traffic conditions passing
+			//notificationTraffic.publishState(" Normal traffic in A ");
+			if (PerturbedTraffic) {
+				runPerturbedTraffic();
+			}
+			try {
+				Thread.sleep(normalDuration * 10000L); // 1000L = 1000ms = 1 second
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				log.error("Interrupted while running normal scenario", e);
+			}
+		}
+	}
+
+	private void runPerturbedTraffic() {
+		while (true) {
+			log.info("[{}] ALERT TRAFFIC ! : ", new Date());
+			notificationTraffic.publishState(" Pertubed traffic in A");
+			boolean perturbedDurationRandom = Math.random() < 0.2;
+			if (!perturbedDurationRandom) {
+				runNormalTraffic();
+				try {
+					Thread.sleep(perturbedDuration * 1000L);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+					log.error("Interrupted while running perturbed scenario", e);
+				}
+			}
+		}
+	}
+}

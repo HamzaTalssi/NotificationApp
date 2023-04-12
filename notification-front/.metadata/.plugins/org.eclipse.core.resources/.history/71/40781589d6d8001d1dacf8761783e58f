@@ -1,0 +1,6 @@
+package com.thelast.pds.episen.notificationservice.configuration;
+
+public enum Localisation {
+
+	CRETEIL
+}

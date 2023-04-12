@@ -1,0 +1,50 @@
+//package com.thelast.pds.episen.notificationmanagerservice.mockTraffic;
+//
+//import java.util.Date;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import com.thelast.pds.episen.notificationmanagerservice.traffic.producer.NotificationTraffic;
+//
+//public class MyTimerTrafficNormal implements java.lang.Runnable {
+//	private static final Logger log = LoggerFactory.getLogger(MyTimerTrafficNormal.class);
+//	private int i = 15; //il va exécuter pendant 15s
+//
+//	@Autowired
+//	private NotificationTraffic notif = new NotificationTraffic();
+//	
+//	public MyTimerTrafficNormal(int i) { 
+//		this.i=i;
+//		}
+//	
+//	 
+//	    @Override
+//	    public void run() {
+//	        this.runTimer();
+//	    }
+//	    
+//		/*
+//		 * public void init(int i) { this.i=i; }
+//		 */
+//
+//	    public void runTimer(){
+//	       
+//	         while (i>0){
+//	        	 log.info("[" + new Date() + "] " + " Normal sur A");
+//	        	 notif.publishEtat(" Normal sur A ");
+//	          try {
+//	            i--;
+//	            Thread.sleep(1000L);    // 1000L = 1000ms = 1 second
+//	           }
+//	           catch (InterruptedException e) {
+//	        	   
+//	       }
+//
+//	         }
+//	         
+//	         if(i==0) { //lorsque son compteur se termine il déclenche le scénario pertubé
+//	         	MyTimerTrafficPertubé trafficPertub = new MyTimerTrafficPertubé(10);
+//	         	trafficPertub.runTimer();
+//	         }
+//	    }
+//}

@@ -1,0 +1,60 @@
+package com.thelast.pds.episen.notificationmanagerservice.mock;
+
+import java.util.Date;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+
+import com.thelast.pds.episen.notificationmanagerservice.producer.notification.service.NotificationTraffic;
+
+public class MyTimerTraffic implements Runnable {
+	private static final Logger log = LoggerFactory.getLogger(MyTimerTraffic.class);
+	private int normalDuration = 10; // normal scenario duration in seconds
+	private int perturbedDuration = 5; // perturbed scenario duration in seconds
+    private String location = "Creteil"; // location to check the traffic for
+
+
+	@Autowired
+	private NotificationTraffic notificationTraffic = new NotificationTraffic();
+
+	@Override
+	public void run() {
+		runNormalTraffic();
+	}
+
+	private void runNormalTraffic() {
+		while (true) {
+			log.info("[{}] Checking the traffic for {} ***************TRAFFIC************* ", new Date());
+			boolean PerturbedTraffic = Math.random() < 0.1; // less than 10% chance of perturbed traffic conditions passing
+			if (PerturbedTraffic) {
+				runPerturbedTraffic();
+			}
+			try {
+				Thread.sleep(normalDuration * 1000L);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				log.error("Interrupted while running normal scenario", e);
+			}
+		}
+	}
+
+	private void runPerturbedTraffic() {
+		while (true) {
+			log.info("[{}] ALERT TRAFFIC ! ", new Date());
+			notificationTraffic.publishState(" Pertubed traffic in " + location);
+			try {
+				Thread.sleep(perturbedDuration * 1000L);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				log.error("Interrupted while running perturbed scenario", e);
+			}
+			boolean perturbedDurationRandom = Math.random() < 0.1;
+			if (!perturbedDurationRandom) {
+				notificationTraffic.publishState(" The Traffic is back to normal in  " + location);
+				log.info(" Traffic back to normal in A ");
+				runNormalTraffic();
+			}
+		}
+	}
+}

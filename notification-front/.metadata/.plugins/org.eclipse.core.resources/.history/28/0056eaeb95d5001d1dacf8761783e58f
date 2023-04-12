@@ -1,0 +1,27 @@
+package com.thelast.pds.episen.notificationservice.gestionFacture;
+
+import java.util.Date;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+public class CustomerBill {
+
+	private String username;
+	private String link;
+
+
+	@Override
+	public String toString() {
+		return "" +
+				" facture dispo: '" + username + '\''+
+				" available through :  '" + link + '\''+" at";
+
+	}
+}

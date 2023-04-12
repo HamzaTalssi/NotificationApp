@@ -1,0 +1,40 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="MQTT Messages"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/subscribe_weather_button"
+        android:layout_width="145dp"
+        android:layout_height="76dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="16dp"
+        android:text="Subscribe to Weather Topic" />
+
+    <Button
+        android:id="@+id/subscribe_traffic_button"
+        android:layout_width="175dp"
+        android:layout_height="74dp"
+        android:layout_below="@+id/subscribe_weather_button"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="211dp"
+        android:layout_marginTop="-73dp"
+        android:text="Subscribe to Traffic Topic" />
+
+</RelativeLayout>

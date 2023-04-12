@@ -1,0 +1,21 @@
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import com.thelast.pds.episen.notificationmanagerservice.mock.MyTimerTraffic;
+import com.thelast.pds.episen.notificationmanagerservice.mock.WeatherAlert;
+
+@SpringBootApplication
+public class NotificationManagerServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(NotificationManagerServiceApplication.class, args);
+        
+        // Create and run the MyTimerTraffic instance in the current thread
+        MyTimerTraffic timer = new MyTimerTraffic();
+        timer.run();
+        
+        // Create and run the WeatherAlert instance in a new thread
+        WeatherAlert weatherAlert = new WeatherAlert();
+        Thread weatherThread = new Thread(weatherAlert);
+        weatherThread.start();
+    }
+}

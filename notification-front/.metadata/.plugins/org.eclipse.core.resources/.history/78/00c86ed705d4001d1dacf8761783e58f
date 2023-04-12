@@ -1,0 +1,5 @@
+package com.thelast.pds.episen.notificationmanagerservice.mockTraffic;
+
+public class MyTimerTraffic {
+
+}

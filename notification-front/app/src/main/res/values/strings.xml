@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">NotificationApp</string>
+
+    <!-- Notification channel name and description -->
+    <string name="notification_channel_name">MQTT Notifications</string>
+    <string name="notification_channel_description">Notifications for new MQTT messages</string>
+
+    <!-- Colors used in the notification -->
+    <color name="notification_background">#FFFFFF</color>
+    <color name="notification_title">#000000</color>
+    <color name="notification_message">#333333</color>
+
+    <!-- Notification layout padding -->
+    <dimen name="notification_padding">16dp</dimen>
+</resources>

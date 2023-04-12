@@ -1,0 +1,67 @@
+package com.thelast.pds.episen.notificationservice.notificationworker;
+
+import com.thelast.pds.episen.notificationservice.configuration.NotificationConfiguration;
+import com.thelast.pds.episen.notificationservice.gestionFacture.CustomerBill;
+import com.thelast.pds.episen.notificationservice.mqttpublisher.MessagingService;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.nio.charset.StandardCharsets;
+
+
+@Service
+public class Consumer {
+
+    private static final Logger log = LoggerFactory.getLogger(Consumer.class);
+
+    @Autowired
+    private RabbitTemplate template;
+
+    @Autowired
+    private MessagingService messagingService;
+
+    String queueName;
+    String billQueue;
+    
+    
+    public Consumer() {
+    	this.queueName = NotificationConfiguration.TRAFFIC_QUEUE;
+    	this.billQueue = NotificationConfiguration.WEATHER_QUEUE;
+    	CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
+    	AmqpAdmin admin = new RabbitAdmin(connectionFactory);
+    	admin.declareQueue(new Queue(queueName));
+    	admin.declareQueue(new Queue(billQueue));
+    	template = new RabbitTemplate(connectionFactory);
+    	}
+    
+   @RabbitListener(queues = NotificationConfiguration.TRAFFIC_QUEUE)
+    public void receiveTrafficState(String receiveNot) throws MqttException {
+        log.info("Received traffic update of " + receiveNot);
+       final String topic = "trafficState";
+       if (!receiveNot.equals(" Normal traffic in A ")) {
+            messagingService.publish(topic, "Pertubed traffic in A", 0, true);
+        }
+   }
+   
+   @RabbitListener(queues = NotificationConfiguration.WEATHER_QUEUE)
+   public void receiveWeatherState(String receiveNot) throws MqttException {
+       log.info("Received traffic update of " + receiveNot);
+      final String topic = "trafficState";
+      if (!receiveNot.equals(" Normal traffic in A ")) {
+           messagingService.publish(topic, "Pertubed traffic in A", 0, true);
+       }
+  }
+   
+      
+
+}

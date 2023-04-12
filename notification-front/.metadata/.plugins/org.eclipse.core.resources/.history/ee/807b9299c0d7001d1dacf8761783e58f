@@ -1,0 +1,13 @@
+version: '3'
+services:
+  rabbitmq:
+    image: 'rabbitmq:3.6-management-alpine'
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+  notificationservice:
+      image: 'notification-service:0.0.1-SNAPSHOT'
+      ports:
+        - "8081:8081"
+      depends_on:
+        - rabbitmq

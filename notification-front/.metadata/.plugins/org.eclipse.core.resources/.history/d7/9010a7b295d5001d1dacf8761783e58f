@@ -1,0 +1,50 @@
+package com.thelast.pds.episen.notificationmanagerservice.mockTraffic;
+
+import java.util.Date;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.thelast.pds.episen.notificationmanagerservice.traffic.producer.NotificationTraffic;
+
+
+
+
+public class MyTimerTrafficPertubé implements java.lang.Runnable {
+	private static final Logger log = LoggerFactory.getLogger(MyTimerTrafficPertubé.class);
+	private int i = 0; //il va exécuter pendant 10s
+
+	@Autowired
+	private NotificationTraffic notific = new NotificationTraffic();
+	
+	public MyTimerTrafficPertubé(int i) {
+		this.i=i;
+	}
+	
+    @Override
+    public void run() {
+        this.runTimer();
+    }
+
+    public void runTimer(){
+       
+        //!Thread.currentThread().isInterrupted() 
+        while (i>0){
+        	 log.info("[" + new Date() + "] " + " Pertubé sur A");
+        	 notific.publishEtat(" Pertubé sur A ");
+          try {
+            i--;
+            Thread.sleep(1000L);    // 1000L = 1000ms = 1 second
+           }
+           catch (InterruptedException e) { 
+        	  
+       }
+
+         }
+        if(i==0) { //quand il finit ce scénario, il déclenche celui qui est normal
+        	MyTimerTrafficNormal trafficNorm = new MyTimerTrafficNormal(15);
+        	trafficNorm.runTimer();
+        }
+    }
+
+}

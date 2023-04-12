@@ -1,0 +1,60 @@
+package com.thelast.pds.episen.notificationmanagerservice.mock;
+
+import java.util.Date;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+
+import com.thelast.pds.episen.notificationmanagerservice.producer.notification.NotificationTraffic;
+
+public class MyTimerTraffic implements Runnable {
+    private static final Logger log = LoggerFactory.getLogger(MyTimerTraffic.class);
+    private int normalDuration = 15; // normal scenario duration in seconds
+    private int perturbedDuration = 10; // perturbed scenario duration in seconds
+
+    @Autowired
+    private NotificationTraffic notificationTraffic = new NotificationTraffic();
+
+    @Override
+    public void run() {
+        runNormalScenario();
+    }
+
+    private void runNormalScenario() {
+        int i = normalDuration;
+        while (i > 0) {
+            log.info("[{}] Normal in A", new Date());
+            notificationTraffic.publishState("Normal traffic in A");
+            try {
+                i--;
+                Thread.sleep(1000L); // 1000L = 1000ms = 1 second
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("Interrupted while running normal scenario", e);
+            }
+        }
+        if (i == 0) {
+            runPerturbedScenario();
+        }
+    }
+
+    private void runPerturbedScenario() {
+        int i = perturbedDuration;
+        while (i > 0) {
+            log.info("[{}] Pertubed in A", new Date());
+            notificationTraffic.publishState("Pertubed traffic in A");
+            try {
+                i--;
+                Thread.sleep(1000L); // 1000L = 1000ms = 1 second
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("Interrupted while running perturbed scenario", e);
+            }
+        }
+        if (i == 0) {
+            runNormalScenario();
+        }
+    }
+}
+
