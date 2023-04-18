@@ -1,0 +1,21 @@
+package com.thelast.pds.episen.notificationmanagerservice.bill.model;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+public class CustomerBill {
+	//@JsonProperty("username")
+	//@JsonProperty("link")
+	private String username;
+	private String link;
+
+
+}

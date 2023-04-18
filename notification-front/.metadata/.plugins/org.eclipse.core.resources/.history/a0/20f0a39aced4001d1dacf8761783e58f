@@ -1,0 +1,81 @@
+package com.thelast.pds.episen.notificationmanagerservice.configuration;
+
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class NotificationConfiguration {
+
+	public static final String QUEUE = "message_queue";
+	public static final String EXCHANGE = "message_exchange";
+	public static final String ROUTING_KEY = "message_routingKey";
+
+	public static final String BILLS_QUEUE = "bill_queue";
+	public static final String BILLS_ROUTING_KEY = "bill_routingKey";
+
+	public static final String WEATHER_QUEUE = "weather_queue";
+	public static final String WEATHER_ROUTING_KEY = "weather_routingKey";
+
+	@Bean
+	public Queue trafficQueue() {
+		// The first parameter is the name of the message queue ; The second parameter
+		// indicates whether the message is persistent ; The third parameter indicates
+		// whether the message queue is exclusive
+		// The fourth parameter indicates that if there are no subscribed consumers in
+		// the queue , The queue is automatically deleted , It is generally applicable
+		// to temporary queues
+		return new Queue(QUEUE, true, false, false);
+	}
+
+	@Bean
+	public Queue billQueue() {
+		return new Queue(BILLS_QUEUE);
+	}
+
+	@Bean
+	public Queue weatherQueue() {
+		return new Queue(WEATHER_QUEUE);
+	}
+
+	@Bean
+	public TopicExchange exchange() {
+		return new TopicExchange(EXCHANGE);
+	}
+
+	@Bean
+	public Binding trafficBinding(Queue queue, TopicExchange exchange) {
+		return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY);
+	}
+
+	@Bean
+	public Binding billBinding(Queue billQueue, TopicExchange exchange) {
+		return BindingBuilder.bind(billQueue).to(exchange).with(BILLS_ROUTING_KEY);
+	}
+	
+	@Bean
+	public Binding weatherBinding(Queue queue, TopicExchange exchange) {
+		return BindingBuilder.bind(queue).to(exchange).with(WEATHER_ROUTING_KEY);
+	}
+
+	@Bean
+	public MessageConverter messageConverter() {
+		return new Jackson2JsonMessageConverter();
+	}
+
+	@Bean
+	public AmqpTemplate template(ConnectionFactory connectionFactory) {
+		final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+		rabbitTemplate.setMessageConverter(messageConverter());
+		return rabbitTemplate;
+	}
+
+}

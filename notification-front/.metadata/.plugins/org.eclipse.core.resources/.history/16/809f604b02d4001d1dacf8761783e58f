@@ -1,0 +1,20 @@
+
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import com.thelast.pds.episen.notificationmanagerservice.mockTraffic.MyTimerTrafficNormal;
+
+import java.util.Timer;
+
+@SpringBootApplication
+public class NotificationManagerServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(NotificationManagerServiceApplication.class, args);
+        
+		
+		  MyTimerTrafficNormal timer1 = new MyTimerTrafficNormal(15); //on lance le 1er scénario 
+		  timer1.runTimer();
+		   
+    }
+}

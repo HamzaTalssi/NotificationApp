@@ -1,0 +1,51 @@
+package com.thelast.pds.episen.notificationmanagerservice.traffic.producer;
+
+import java.sql.Date;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.thelast.pds.episen.notificationmanagerservice.configuration.ExpiredMessageConfiguration;
+import com.thelast.pds.episen.notificationmanagerservice.configuration.NotificationConfiguration;
+
+@RestController
+@RequestMapping("")
+public class NotificationTraffic {
+
+    private static final Logger log = LoggerFactory.getLogger(NotificationTraffic.class);
+
+	@Autowired
+    private RabbitTemplate template = new RabbitTemplate();
+    String queueName;
+    
+    public NotificationTraffic() {
+    	this.queueName = NotificationConfiguration.QUEUE;
+    	CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
+    	AmqpAdmin admin = new RabbitAdmin(connectionFactory);
+    	admin.declareQueue(new Queue(queueName));
+    	template = new RabbitTemplate(connectionFactory);
+    	}
+
+    	public String publishState(String state) {
+    	    log.info("Sending traffic state " + state);
+    	    MessageProperties properties = new MessageProperties();
+    	    properties.setContentType("application/octet-stream");
+    	    properties.setTimestamp(new Date(System.currentTimeMillis()));
+    	    Message message = new Message(state.getBytes(), properties);
+    	    // the message will be expired after 20s if it remain in the queue
+    	    template.convertAndSend(queueName, message, new ExpiredMessageConfiguration(20000L, template));
+    	    return "Traffic state published";
+    	}
+
+}

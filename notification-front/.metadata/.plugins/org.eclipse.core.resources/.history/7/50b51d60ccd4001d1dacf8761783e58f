@@ -1,0 +1,36 @@
+package notification_Test;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.thelast.pds.episen.notificationmanagerservice.mockTraffic.MyTimerTrafficPertubé;
+import com.thelast.pds.episen.notificationmanagerservice.producer.notification.NotificationTraffic;
+
+
+public class MockTrafficTest {
+
+	@Autowired
+	private NotificationTraffic notif = new NotificationTraffic();
+	private int i = 15;
+
+	@Test
+	void testMockTraffic() {
+
+		while (i > 0) {
+			notif.publishEtat(" Normal sur A ");
+			try {
+				i--;
+				Thread.sleep(1000L); 
+			} catch (InterruptedException e) {
+
+			}
+
+		}
+
+		if (i == 0) { 
+			MyTimerTrafficPertubé trafficPertub = new MyTimerTrafficPertubé(10);
+			trafficPertub.runTimer();
+		}
+
+	}
+}
