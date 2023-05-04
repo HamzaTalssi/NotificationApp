@@ -43,7 +43,7 @@ public class NotificationWeatherProducer {
 		properties.setTimestamp(new Date(System.currentTimeMillis()));
 		Message message = new Message(state.getBytes(), properties);
 		// the message will be expired after 60s if it remains in the queue
-		template.convertAndSend(queueName, message, new ExpiredMessageConfiguration(60000L, template));
+		template.convertAndSend(queueName, message, new ExpiredMessageConfiguration(60 * 1000L, template));
 		return "Weather condition published";
 	}
 

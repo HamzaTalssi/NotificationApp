@@ -14,26 +14,19 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class NotificationExchangeConfiguration {
-	public static final String QUEUE = "traffic_queue";
+	public static final String TRAFFIC_QUEUE = "traffic";
 	public static final String EXCHANGE_TRAFFIC = "traffic_exchange";
 	public static final String ROUTING_KEY = "traffic_routingKey";
 
-	public static final String WEATHER_QUEUE = "weather_queue";
+	public static final String WEATHER_QUEUE = "weather";
 	public static final String EXCHANGE_WEATHER = "traffic_exchange";
 	public static final String WEATHER_ROUTING_KEY = "weather_routingKey";
 
 	@Bean
 	public Queue trafficQueue() {
-		// The first parameter is the name of the message queue ; The second parameter
-		// indicates whether the message is persistent ; The third parameter indicates
-		// whether the message queue is exclusive
-		// The fourth parameter indicates that if there are no subscribed consumers in
-		// the queue , The queue is automatically deleted , It is generally applicable
-		// to temporary queues
-		return new Queue(QUEUE, true, false, false);
+		return new Queue(TRAFFIC_QUEUE);
 	}
 
-	
 	public Queue weatherQueue() {
 		return new Queue(WEATHER_QUEUE);
 	}
@@ -64,8 +57,8 @@ public class NotificationExchangeConfiguration {
 	}
 
 	@Bean
-	public AmqpTemplate template(ConnectionFactory connectionFactory) {
-		final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+	public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+		RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
 		rabbitTemplate.setMessageConverter(messageConverter());
 		return rabbitTemplate;
 	}

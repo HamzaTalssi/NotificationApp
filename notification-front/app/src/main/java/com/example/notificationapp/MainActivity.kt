@@ -24,7 +24,9 @@ import androidx.core.content.ContextCompat
 import com.example.notificationapp.R
 import org.eclipse.paho.client.mqttv3.*
 import java.nio.charset.Charset
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -46,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             val min = currentTime.minute
             val hour = currentTime.hour
             Log.d(TAG, "Current time :$hour h $min min $sec s")
-            subscribeToTopic("weatherState2")
+            subscribeToTopic("weatherState94")
         }
 
         findViewById<Button>(R.id.subscribe_traffic_button).setOnClickListener {
@@ -54,7 +56,7 @@ class MainActivity : AppCompatActivity() {
             val sec = currentTime.second
             val min = currentTime.minute
             Log.d(TAG, "Current time : $min minute and $sec s")
-            subscribeToTopic("trafficState")
+            subscribeToTopic("trafficState94")
         }
     }
 
@@ -72,6 +74,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val receivedMessages: MutableSet<String> = mutableSetOf()
+
     private fun subscribeToTopic(topic: String) {
         // Create an instance of the Mosquitto MQTT client and connect to the broker
         mqttClient = MqttClient("tcp://broker.hivemq.com:1883", MqttClient.generateClientId(), null)
@@ -79,9 +83,21 @@ class MainActivity : AppCompatActivity() {
 
         // Subscribe to the given topic
         mqttClient.subscribe(topic, object : IMqttMessageListener {
+            @RequiresApi(Build.VERSION_CODES.O)
             override fun messageArrived(topic: String?, message: MqttMessage?) {
                 val text = message?.payload?.toString(Charset.defaultCharset())
                 Log.d(TAG, "Received message on topic $topic: $text")
+
+                // Check if the message has already been received
+                if (receivedMessages.contains(text)) {
+                    Log.d(TAG, "Message already received, ignoring...")
+                    return
+                }
+
+                // Add the message to the received messages set
+                if (text != null) {
+                    receivedMessages.add(text)
+                }
 
                 // Display the message in the scroll view
                 runOnUiThread {
@@ -92,22 +108,19 @@ class MainActivity : AppCompatActivity() {
 
                 // Send a notification with the message content
                 sendNotification(text)
-
-                // Unsubscribe from the topic to remove the message from the broker's queue
-                //mqttClient.unsubscribe(topic)
-                Log.d(TAG, "Unsubscribed from topic $topic to remove message from queue")
             }
         })
 
-        // Disconnect from the broker after 1 minute
+        // Disconnect from the broker after 5 minute
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({
             if(mqttClient.isConnected){
                 mqttClient.disconnect()
                 Log.d(TAG, "Disconnected from broker")}
-        }, 600000)
+        }, 300 * 1000)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun sendNotification(message: String?) {
         // Create an intent to launch the app when the notification is clicked
         val intent = Intent(this, MainActivity::class.java).apply {
@@ -115,23 +128,66 @@ class MainActivity : AppCompatActivity() {
         }
         val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
 
-// Create the notification
-        val builder = NotificationCompat.Builder(this, "MQTTNotifications")
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .setContentTitle("New message")
-            .setContentText(message)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setSmallIcon(R.drawable.ic_launcher_background)
+        val payloadString = message.toString()
+        val timeString = payloadString.substring(payloadString.length - 19)
 
-// Show the notification
-        with(NotificationManagerCompat.from(this)) {
-            if(!message.equals("Warning severe weather incoming !")){
-            notify(0, builder.build())
-            }else if (message.equals("Weather condition back to normal !")) {
-            notify(1, builder.build())}
-            else {
-                notify(2,builder.build())
+// Show the notification with a different ID based on the message
+        when (message) {
+            "Warning severe weather incoming at $timeString" -> {
+                val notificationId = 0
+                val builder = NotificationCompat.Builder(this, "MQTTNotifications")
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true)
+                    .setContentTitle("New Message")
+                    .setContentText(message)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setSmallIcon(R.drawable.ic_launcher_background)
+
+                with(NotificationManagerCompat.from(this)) {
+                    notify(notificationId, builder.build())
+                }
+            }
+            "Weather condition back to normal at $timeString" -> {
+                val notificationId = 1
+                val builder = NotificationCompat.Builder(this, "MQTTNotifications")
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true)
+                    .setContentTitle("New Message")
+                    .setContentText(message)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setSmallIcon(R.drawable.ic_launcher_background)
+
+                with(NotificationManagerCompat.from(this)) {
+                    notify(notificationId, builder.build())
+                }
+            }
+            "Perturbed traffic in A at $timeString" -> {
+                val notificationId = 2
+                val builder = NotificationCompat.Builder(this, "MQTTNotifications")
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true)
+                    .setContentTitle("New message")
+                    .setContentText(message)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setSmallIcon(R.drawable.ic_launcher_background)
+
+                with(NotificationManagerCompat.from(this)) {
+                    notify(notificationId, builder.build())
+                }
+            }
+            else -> {
+                val notificationId = 3
+                val builder = NotificationCompat.Builder(this, "MQTTNotifications")
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true)
+                    .setContentTitle("New message")
+                    .setContentText(message)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setSmallIcon(R.drawable.ic_launcher_background)
+
+                with(NotificationManagerCompat.from(this)) {
+                    notify(notificationId, builder.build())
+                }
             }
         }
 

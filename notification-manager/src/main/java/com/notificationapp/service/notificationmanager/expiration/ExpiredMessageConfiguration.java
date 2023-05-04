@@ -28,7 +28,8 @@ public class ExpiredMessageConfiguration implements MessagePostProcessor {
 	        return null; // Discard the message
 	    } else {
 	        long delay = (expirationTimeInMillis - ageInMillis);
-	        log.info("Delaying message for {} ms", delay);
+	        long seconds = delay / 1000;
+	        log.info("Delaying message for {} s", seconds);
 	        MessageProperties messageProperties = message.getMessageProperties();
 	        messageProperties.setExpiration(String.valueOf(delay));
 	        return new Message(message.getBody(), messageProperties);

@@ -27,11 +27,11 @@ public class NotificationTrafficProducer {
 
 	@Autowired
 	private RabbitTemplate template = new RabbitTemplate();
+
 	String queueName;
-	String billQueue;
 
 	public NotificationTrafficProducer() {
-		this.queueName = NotificationExchangeConfiguration.QUEUE;
+		this.queueName = NotificationExchangeConfiguration.TRAFFIC_QUEUE;
 		CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
 		AmqpAdmin admin = new RabbitAdmin(connectionFactory);
 		admin.declareQueue(new Queue(queueName));
@@ -45,7 +45,7 @@ public class NotificationTrafficProducer {
 		properties.setTimestamp(new Date(System.currentTimeMillis()));
 		Message message = new Message(state.getBytes(), properties);
 		// the message will be expired after 60s if it remains in the queue
-		template.convertAndSend(queueName, message, new ExpiredMessageConfiguration(60000L, template));
+		template.convertAndSend(queueName, message, new ExpiredMessageConfiguration(60 * 1000L, template));
 		return "Weather condition published";
 
 	}
