@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             val min = currentTime.minute
             val hour = currentTime.hour
             Log.d(TAG, "Current time :$hour h $min min $sec s")
-            subscribeToTopic("weatherState94")
+            subscribeToTopic("weatherState92")
         }
 
         findViewById<Button>(R.id.subscribe_traffic_button).setOnClickListener {
@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
             val sec = currentTime.second
             val min = currentTime.minute
             Log.d(TAG, "Current time : $min minute and $sec s")
-            subscribeToTopic("trafficState94")
+            subscribeToTopic("trafficState92")
         }
     }
 

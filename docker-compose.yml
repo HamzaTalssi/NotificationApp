@@ -1,0 +1,14 @@
+version: '3'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    networks:
+    - notification
+    ports:
+    - 5673:5672
+    - 15673:15672
+
+networks:
+     notification:
+      external: true

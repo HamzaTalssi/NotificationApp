@@ -1,11 +1,11 @@
 spring:
  rabbitmq:
-   host: host.docker.internal
-   port : 5672
+   host: localhost
+   port : 5673
 
 logging:
  level:
   org: ERROR
 
 server:
- port: 8089
+ port: 8069

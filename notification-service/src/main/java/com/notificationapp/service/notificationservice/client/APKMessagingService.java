@@ -33,6 +33,7 @@ public class APKMessagingService {
         byte[] newPayload = new byte[existingPayload.length + timePayload.length];
         System.arraycopy(existingPayload, 0, newPayload, 0, existingPayload.length);
         System.arraycopy(timePayload, 0, newPayload, existingPayload.length, timePayload.length);
+        mqttMessage.setPayload(newPayload);
         mqttMessage.setQos(qos);
         mqttMessage.setRetained(retained);
         mqttClient.publish(topic, mqttMessage);

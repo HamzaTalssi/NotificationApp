@@ -48,7 +48,7 @@ public class WeatherMock implements Runnable {
 			// scenario
 			try {
 				Random random = new Random();
-				int randNum = random.nextInt(20) + 5;
+				int randNum = random.nextInt(15) + 5;
 				Thread.sleep((severeInterval * randNum) * 1000L);
 				boolean severeConditions = (Math.random() < 0.1); //
 				if (!severeConditions) {

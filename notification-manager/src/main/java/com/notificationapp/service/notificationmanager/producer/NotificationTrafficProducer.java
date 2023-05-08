@@ -28,17 +28,20 @@ public class NotificationTrafficProducer {
 	@Autowired
 	private RabbitTemplate template = new RabbitTemplate();
 
-	String queueName;
+    
+    private String queueName;
+
+
 
 	public NotificationTrafficProducer() {
 		this.queueName = NotificationExchangeConfiguration.TRAFFIC_QUEUE;
-		CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
-		AmqpAdmin admin = new RabbitAdmin(connectionFactory);
-		admin.declareQueue(new Queue(queueName));
-		template = new RabbitTemplate(connectionFactory);
 	}
 
 	public String publishState(String state) {
+		CachingConnectionFactory connectionFactory = new CachingConnectionFactory("rabbitmq",5672);
+		AmqpAdmin admin = new RabbitAdmin(connectionFactory);
+		admin.declareQueue(new Queue(queueName));
+		template = new RabbitTemplate(connectionFactory);
 		// log.info("Sending weather condition " + state);
 		MessageProperties properties = new MessageProperties();
 		properties.setContentType("application/octet-stream");

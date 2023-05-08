@@ -26,17 +26,19 @@ public class NotificationWeatherProducer {
 
 	@Autowired
 	private RabbitTemplate template = new RabbitTemplate();
-	String queueName;
+	
+    
+    private String queueName;
 
 	public NotificationWeatherProducer() {
 		this.queueName = NotificationExchangeConfiguration.WEATHER_QUEUE;
-		CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
-		AmqpAdmin admin = new RabbitAdmin(connectionFactory);
-		admin.declareQueue(new Queue(queueName));
-		template = new RabbitTemplate(connectionFactory);
 	}
 
 	public String publishWeatherAlert(String state) {
+		CachingConnectionFactory connectionFactory = new CachingConnectionFactory("rabbitmq",5672);
+		AmqpAdmin admin = new RabbitAdmin(connectionFactory);
+		admin.declareQueue(new Queue(queueName));
+		template = new RabbitTemplate(connectionFactory);
 		// log.info("Sending weather condition " + state);
 		MessageProperties properties = new MessageProperties();
 		properties.setContentType("application/octet-stream");
