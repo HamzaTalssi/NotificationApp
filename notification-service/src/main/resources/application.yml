@@ -1,6 +1,14 @@
 spring:
-  rabbitmq:
-    host: rabbitmq
-    port: 5672
+  rabbit:
+    host: 172.31.250.169
+    port: 5673
+  mqtt:
+    host: tcp://172.31.250.165:1883
+    clientId: test
+    username: notificationapp
+    password: notificationapp
+    topicWeather: weatherState91
+    topicTraffic: trafficState91
+
 server:
   port: 8085

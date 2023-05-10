@@ -1,6 +1,8 @@
 package com.notificationapp.service.notificationservice.client;
 
 import org.eclipse.paho.client.mqttv3.IMqttClient;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
@@ -15,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 public class APKMessagingService {
 
     @Autowired
-    private IMqttClient mqttClient;
+    private MqttClient mqttClient;
 
 
     public void publishMqttTrafficState(final String topic,final String payload, int qos, boolean retained)

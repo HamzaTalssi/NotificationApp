@@ -1,32 +1,48 @@
 package com.notificationapp.service.notificationservice.configuration;
 
-import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.notificationapp.service.notificationservice.consumer.NotificationConsumer;
+
+
 @Configuration
+@EnableConfigurationProperties({RabbitProperties.class,MqttProperties.class})
 public class MqttConfiguration {
 
+    @Autowired
+    private MqttProperties mqttProperties;
+    
+    @Autowired
+    private RabbitProperties rabbitProperties;
+
     @Bean
-    @ConfigurationProperties(prefix = "mqtt")
     public MqttConnectOptions mqttConnectOptions() {
-        return new MqttConnectOptions();
+        MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
+        mqttConnectOptions.setServerURIs(new String[]{mqttProperties.getHost()});
+        mqttConnectOptions.setUserName(mqttProperties.getUsername());
+        mqttConnectOptions.setPassword(mqttProperties.getPassword());
+        mqttConnectOptions.setCleanSession(true);
+        return mqttConnectOptions;
     }
 
     @Bean
-    public IMqttClient mqttClient(@Value("notificationID") String clientId,
-                                  @Value("broker.hivemq.com") String hostname, @Value("1883") int port) throws MqttException {
-
-        IMqttClient mqttClient = new MqttClient("tcp://" + hostname + ":" + port, clientId);
-
+    public MqttClient mqttClient() throws MqttException {
+        MqttClient mqttClient = new MqttClient(mqttProperties.getHost(), mqttProperties.getClientId(),new MemoryPersistence());
         mqttClient.connect(mqttConnectOptions());
-
         return mqttClient;
     }
+    
+    @Bean
+    public NotificationConsumer notificationConsumer() {
+    	return new NotificationConsumer(mqttProperties, rabbitProperties);
+    }
+
 
 }
