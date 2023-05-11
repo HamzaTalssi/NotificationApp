@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             val min = currentTime.minute
             val hour = currentTime.hour
             Log.d(TAG, "Current time :$hour h $min min $sec s")
-            subscribeToTopic("weatherState92")
+            subscribeToTopic1("weatherState91")
         }
 
         findViewById<Button>(R.id.subscribe_traffic_button).setOnClickListener {
@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
             val sec = currentTime.second
             val min = currentTime.minute
             Log.d(TAG, "Current time : $min minute and $sec s")
-            subscribeToTopic("trafficState92")
+            subscribeToTopic2("trafficState91")
         }
     }
 
@@ -75,11 +75,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val receivedMessages: MutableSet<String> = mutableSetOf()
+    private var lastReceivedTime: LocalDateTime? = null
 
-    private fun subscribeToTopic(topic: String) {
+    private fun subscribeToTopic1(topic: String) {
         // Create an instance of the Mosquitto MQTT client and connect to the broker
-        mqttClient = MqttClient("tcp://broker.hivemq.com:1883", MqttClient.generateClientId(), null)
-        mqttClient.connect()
+        mqttClient = MqttClient("tcp://172.31.250.179:12345", "notificationWeather", null)
+        val connOpts = MqttConnectOptions()
+        connOpts.userName = "notificationapp"
+        connOpts.password = "notificationapp".toCharArray()
+        connOpts.isCleanSession = false // Set the clean session flag to false
+        mqttClient.connect(connOpts)
 
         // Subscribe to the given topic
         mqttClient.subscribe(topic, object : IMqttMessageListener {
@@ -87,12 +92,6 @@ class MainActivity : AppCompatActivity() {
             override fun messageArrived(topic: String?, message: MqttMessage?) {
                 val text = message?.payload?.toString(Charset.defaultCharset())
                 Log.d(TAG, "Received message on topic $topic: $text")
-
-                // Check if the message has already been received
-                if (receivedMessages.contains(text)) {
-                    Log.d(TAG, "Message already received, ignoring...")
-                    return
-                }
 
                 // Add the message to the received messages set
                 if (text != null) {
@@ -111,14 +110,59 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        // Disconnect from the broker after 5 minute
+        // Disconnect from the broker after 5 minutes
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({
             if(mqttClient.isConnected){
                 mqttClient.disconnect()
                 Log.d(TAG, "Disconnected from broker")}
-        }, 300 * 1000)
+        }, 500 * 1000)
     }
+
+
+    private fun subscribeToTopic2(topic: String) {
+        // Create an instance of the Mosquitto MQTT client and connect to the broker
+        mqttClient = MqttClient("tcp://172.31.250.165:1883", "notificationTraffic", null)
+        val connOpts = MqttConnectOptions()
+        connOpts.userName = "notificationapp"
+        connOpts.password = "notificationapp".toCharArray()
+        connOpts.isCleanSession = false // Set the clean session flag to false
+        mqttClient.connect(connOpts)
+
+        // Subscribe to the given topic
+        mqttClient.subscribe(topic, object : IMqttMessageListener {
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun messageArrived(topic: String?, message: MqttMessage?) {
+                val text = message?.payload?.toString(Charset.defaultCharset())
+                Log.d(TAG, "Received message on topic $topic: $text")
+
+                // Add the message to the received messages set
+                if (text != null) {
+                    receivedMessages.add(text)
+                }
+
+                // Display the message in the scroll view
+                runOnUiThread {
+                    val currentText = findViewById<TextView>(R.id.text_view).text.toString()
+                    val newText = "$currentText\n$text"
+                    findViewById<TextView>(R.id.text_view).text = newText
+                }
+
+                // Send a notification with the message content
+                sendNotification(text)
+            }
+        })
+
+        // Disconnect from the broker after 5 minutes
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed({
+            if(mqttClient.isConnected){
+                mqttClient.disconnect()
+                Log.d(TAG, "Disconnected from broker")}
+        }, 500 * 1000)
+    }
+
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun sendNotification(message: String?) {
@@ -148,7 +192,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             "Weather condition back to normal at $timeString" -> {
-                val notificationId = 1
+                val notificationId = 0
                 val builder = NotificationCompat.Builder(this, "MQTTNotifications")
                     .setContentIntent(pendingIntent)
                     .setAutoCancel(true)

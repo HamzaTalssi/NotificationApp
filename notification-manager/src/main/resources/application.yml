@@ -1,5 +1,5 @@
 spring:
-  rabbit:
+  rabbitmq:
     host: 172.31.250.169
     port : 5673
 

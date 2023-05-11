@@ -2,7 +2,7 @@ package com.notificationapp.service.notificationmanager.configuration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "spring.rabbit")
+@ConfigurationProperties(prefix = "spring.rabbitmq")
 public class RabbitProperties {
 
 	private String host;

@@ -56,7 +56,7 @@ public class NotificationConsumer {
 		this.rabbitProperties = rabbitProperties;
 		final String host = rabbitProperties.getHost();
 		final int port = rabbitProperties.getPort();
-		CachingConnectionFactory connectionFactory = new CachingConnectionFactory(host, port);
+		CachingConnectionFactory connectionFactory = new CachingConnectionFactory(host,port);
 		AmqpAdmin admin = new RabbitAdmin(connectionFactory);
 		admin.declareQueue(new Queue(queueName));
 		template = new RabbitTemplate(connectionFactory);
