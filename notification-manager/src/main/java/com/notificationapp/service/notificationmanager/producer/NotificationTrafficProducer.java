@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.notificationapp.service.notificationmanager.configuration.NotificationExchangeConfiguration;
+import com.notificationapp.service.notificationmanager.configuration.RabbitProperties;
 import com.notificationapp.service.notificationmanager.expiration.ExpiredMessageConfiguration;
 
-@RestController
-@RequestMapping("")
+
 public class NotificationTrafficProducer {
 
 	private static final Logger log = LoggerFactory.getLogger(NotificationTrafficProducer.class);
@@ -31,17 +31,21 @@ public class NotificationTrafficProducer {
     
     private String queueName;
 
+    private final RabbitProperties rabbitProperties;
 
-
-	public NotificationTrafficProducer() {
+    @Autowired
+	public NotificationTrafficProducer(RabbitProperties rabbitProperties) {
 		this.queueName = NotificationExchangeConfiguration.TRAFFIC_QUEUE;
-	}
-
-	public String publishState(String state) {
-		CachingConnectionFactory connectionFactory = new CachingConnectionFactory("rabbitmq",5672);
+		this.rabbitProperties = rabbitProperties;
+		final String host = rabbitProperties.getHost();
+		final int port = rabbitProperties.getPort();
+		CachingConnectionFactory connectionFactory = new CachingConnectionFactory(host,port);
 		AmqpAdmin admin = new RabbitAdmin(connectionFactory);
 		admin.declareQueue(new Queue(queueName));
 		template = new RabbitTemplate(connectionFactory);
+	}
+
+	public String publishState(String state) {
 		// log.info("Sending weather condition " + state);
 		MessageProperties properties = new MessageProperties();
 		properties.setContentType("application/octet-stream");

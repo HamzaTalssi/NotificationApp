@@ -6,6 +6,7 @@ import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.notificationapp.service.notificationmanager.producer.NotificationWeatherProducer;
 
@@ -15,8 +16,12 @@ public class WeatherMock implements Runnable {
 	private int severeInterval = 1; // interval between weather checks during severe weather conditions in seconds
 	private String location = "CRETEIL"; // location to check the weather for
 
+	private final NotificationWeatherProducer notificationWeather;
+
 	@Autowired
-	private NotificationWeatherProducer notificationWeather = new NotificationWeatherProducer();
+	public WeatherMock(NotificationWeatherProducer notificationWeather) {
+		this.notificationWeather = notificationWeather;
+	}
 
 	@Override
 	public void run() {

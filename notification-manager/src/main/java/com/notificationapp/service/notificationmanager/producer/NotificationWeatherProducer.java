@@ -12,33 +12,34 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.notificationapp.service.notificationmanager.configuration.NotificationExchangeConfiguration;
+import com.notificationapp.service.notificationmanager.configuration.RabbitProperties;
 import com.notificationapp.service.notificationmanager.expiration.ExpiredMessageConfiguration;
 
-@RestController
-@RequestMapping("")
 public class NotificationWeatherProducer {
 
 	private static final Logger log = LoggerFactory.getLogger(NotificationWeatherProducer.class);
 
 	@Autowired
 	private RabbitTemplate template = new RabbitTemplate();
-	
-    
-    private String queueName;
 
-	public NotificationWeatherProducer() {
+	private String queueName;
+	private final RabbitProperties rabbitProperties;
+
+	@Autowired
+	public NotificationWeatherProducer(RabbitProperties rabbitProperties) {
 		this.queueName = NotificationExchangeConfiguration.WEATHER_QUEUE;
-	}
-
-	public String publishWeatherAlert(String state) {
-		CachingConnectionFactory connectionFactory = new CachingConnectionFactory("rabbitmq",5672);
+		this.rabbitProperties = rabbitProperties;
+		final String host = rabbitProperties.getHost();
+		final int port = rabbitProperties.getPort();
+		CachingConnectionFactory connectionFactory = new CachingConnectionFactory(host, port);
 		AmqpAdmin admin = new RabbitAdmin(connectionFactory);
 		admin.declareQueue(new Queue(queueName));
 		template = new RabbitTemplate(connectionFactory);
+	}
+
+	public String publishWeatherAlert(String state) {
 		// log.info("Sending weather condition " + state);
 		MessageProperties properties = new MessageProperties();
 		properties.setContentType("application/octet-stream");

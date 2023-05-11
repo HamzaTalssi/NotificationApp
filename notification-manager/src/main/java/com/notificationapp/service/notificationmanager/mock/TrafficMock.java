@@ -6,7 +6,6 @@ import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 
 import com.notificationapp.service.notificationmanager.producer.NotificationTrafficProducer;
 
@@ -16,8 +15,12 @@ public class TrafficMock implements Runnable {
 	private int perturbedDuration = 1; // perturbed scenario duration in seconds
 	private String location = "CRETEIL"; // location to check the traffic for
 
+	private final NotificationTrafficProducer notificationTraffic;
+
 	@Autowired
-	private NotificationTrafficProducer notificationTraffic = new NotificationTrafficProducer();
+	public TrafficMock(NotificationTrafficProducer notificationTraffic) {
+		this.notificationTraffic = notificationTraffic;
+	}
 
 	@Override
 	public void run() {

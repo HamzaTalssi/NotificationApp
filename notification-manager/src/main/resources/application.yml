@@ -1,7 +1,7 @@
 spring:
- rabbitmq:
-   host: localhost
-   port : 5673
+  rabbit:
+    host: 172.31.250.169
+    port : 5673
 
 logging:
  level:
@@ -9,3 +9,5 @@ logging:
 
 server:
  port: 8069
+ 
+ 
